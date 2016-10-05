@@ -1,4 +1,4 @@
-module DomainModel where
+module DomainModel.Core where
 
 import Control.Concurrent.MVar
 

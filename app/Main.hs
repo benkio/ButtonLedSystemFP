@@ -1,7 +1,8 @@
 module Main where
 
 import Graphics.UI.Gtk
-import DomainModel
+import DomainModel.Core
+import DomainModel.SE
 import Control.Concurrent.MVar
 
 mainGraphic :: IO ()
@@ -25,14 +26,8 @@ mainGraphic = do
   -- When the button receives the "clicked" signal, it will call the
   -- function given as the second argument.
   subject  <- return (Subject () ([]) )
-  observer <- return (\_ -> do tryLedCurrentStatus <- tryTakeMVar led
-                               case tryLedCurrentStatus of
-                                 Just l -> do putStrLn $ show l
-                                              updateLed <- tryPutMVar led (switch l)
-                                              labelSetText ledGUI $ if (getLedStatus (switch l)) then "On" else "Off"
-                                              if (updateLed) then return () else error "error in led update"
-                                 Nothing -> error "error in led Read"
-                               return ())
+  observer <- return (\_ -> do label <- ledMVarObserver led
+                               labelSetText ledGUI label)
 
   subject <- addObserver subject observer
   onClicked button (do notify subject)
@@ -59,4 +54,4 @@ ledMain l = do
       ledMain l'
 
 main :: IO ()
-main = ledMain initialLedStatus
+main = mainGraphic -- ledMain initialLedStatus
