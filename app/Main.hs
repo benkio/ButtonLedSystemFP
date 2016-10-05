@@ -4,8 +4,8 @@ import Graphics.UI.Gtk
 import DomainModel
 import Control.Concurrent.MVar
 
-main :: IO ()
-main = do
+mainGraphic :: IO ()
+mainGraphic = do
   initGUI
   -- Create a new window
   window <- windowNew
@@ -20,7 +20,7 @@ main = do
   -- Creates a new button with the label "Hello World".
   button <- buttonNew
   ledGUI <- labelNew $ Just "Off"
-  led <- initialLedStatus
+  led <- newMVar initialLedStatus
   set button [ buttonLabel := "Turn On led" ]
   -- When the button receives the "clicked" signal, it will call the
   -- function given as the second argument.
@@ -46,3 +46,17 @@ main = do
   -- and waits for an event to occur (like a key press or mouse event).
   -- This function returns if the program should finish.
   mainGUI
+
+ledMain :: Led -> IO ()
+ledMain l = do
+  putStrLn "press enter to switch the led(ditig x + enter to exit)"
+  x <- getChar
+  if (x == 'x')
+    then return()
+    else do
+      let l' = switch l
+      putStrLn $ show l'
+      ledMain l'
+
+main :: IO ()
+main = ledMain initialLedStatus

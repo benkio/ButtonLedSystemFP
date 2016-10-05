@@ -10,8 +10,8 @@ switch Led{status=l} = Led{status=not l}
 getLedStatus :: Led -> Bool
 getLedStatus Led{status=s} = s
 
-initialLedStatus :: IO (MVar Led)
-initialLedStatus = newMVar $ Led{status=False}
+initialLedStatus :: Led
+initialLedStatus = Led{status=False}
 
 {- Logger Domain Model -}
 
