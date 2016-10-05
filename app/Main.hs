@@ -2,6 +2,7 @@ module Main where
 
 import Graphics.UI.Gtk
 import DomainModel
+import Control.Concurrent.MVar
 
 main :: IO ()
 main = do
@@ -19,11 +20,19 @@ main = do
   -- Creates a new button with the label "Hello World".
   button <- buttonNew
   ledGUI <- labelNew $ Just "Off"
+  led <- initialLedStatus
   set button [ buttonLabel := "Turn On led" ]
   -- When the button receives the "clicked" signal, it will call the
   -- function given as the second argument.
   subject  <- return (Subject () ([]) )
-  observer <- return ( \_ -> return()) --TODO
+  observer <- return (\_ -> do tryLedCurrentStatus <- tryTakeMVar led
+                               case tryLedCurrentStatus of
+                                 Just l -> do putStrLn $ show l
+                                              updateLed <- tryPutMVar led (switch l)
+                                              labelSetText ledGUI $ if (getLedStatus (switch l)) then "On" else "Off"
+                                              if (updateLed) then return () else error "error in led update"
+                                 Nothing -> error "error in led Read"
+                               return ())
 
   subject <- addObserver subject observer
   onClicked button (do notify subject)

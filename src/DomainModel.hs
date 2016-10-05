@@ -1,12 +1,18 @@
 module DomainModel where
 
-data Led = Led{status :: Bool}
+import Control.Concurrent.MVar
+
+data Led = Led{status :: Bool} deriving Show
 
 switch :: Led -> Led
 switch Led{status=l} = Led{status=not l}
 
 getLedStatus :: Led -> Bool
 getLedStatus Led{status=s} = s
+
+initialLedStatus :: IO (MVar Led)
+initialLedStatus = newMVar $ Led{status=False}
+
 {- Logger Domain Model -}
 
 log :: String -> IO()
