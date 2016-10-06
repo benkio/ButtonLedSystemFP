@@ -1,11 +1,9 @@
+{-# LANGUAGE DeriveDataTypeable #-}
 module DomainModel.MessageBSL where
 
 import Data.Binary
 import Data.Typeable
 import Control.Distributed.Process
-import Control.Distributed.Process.Node
-import Network.Transport
-import DomainModel.Core
 
 data MessageBSL = NotifyPush
                     | ButtonPressed
@@ -26,7 +24,7 @@ instance Binary (MessageBSL) where
   put (RemoveObserver    o)      = put (6 :: Word8) >> put o
   put (RegisterObserver  o)      = put (7 :: Word8) >> put o
   put (Log               s)      = put (8 :: Word8) >> put s
-  get	                         = do t <- get :: Get Word8
+  get                            = do t <- get :: Get Word8
                                       case t of
                                            1 -> return (NotifyPush)
                                            2 -> return (ButtonPressed)
