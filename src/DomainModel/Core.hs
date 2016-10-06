@@ -1,6 +1,7 @@
 module DomainModel.Core where
 
 import Control.Concurrent.MVar
+import Control.Monad.Writer.Lazy
 
 data Led = Led{status :: Bool} deriving Show
 
@@ -15,8 +16,8 @@ initialLedStatus = Led{status=False}
 
 {- Logger Domain Model -}
 
-log :: String -> IO()
-log s = putStrLn s
+logBLS :: Monad m => a -> String -> m (a,String) -- WriterT String m a
+logBLS a s = runWriterT $ tell ("Log message: " ++ s ++ "\n") >> return a
 
 {- Observer Pattern - Button Model -}
 
