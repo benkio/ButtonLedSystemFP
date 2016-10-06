@@ -16,10 +16,14 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src
   exposed-modules:     DomainModel.Core
+                     , DomainModel.MessageBSL
                      , Application.Local
   build-depends:       base >= 4.7 && < 5,
                        mtl,
-                       gtk
+                       gtk,
+                       distributed-process,
+                       binary,
+                       network-transport
   default-language:    Haskell2010
 
 executable ButtonLedSystemFP-exe
