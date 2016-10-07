@@ -5,8 +5,11 @@ import Control.Concurrent.MVar
 import Control.Monad.Writer.Lazy
 import GHC.Generics (Generic) -- For auto-derivation of serialization
 import Data.Typeable (Typeable) -- For safe serialization
+import Data.Binary (Binary) -- Objects have to be binary to send over the network
 
 data Led = Led{status :: Bool} deriving (Show, Generic, Typeable)
+
+instance Binary Led
 
 switch :: Led -> Led
 switch Led{status=l} = Led{status=not l}

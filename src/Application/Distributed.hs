@@ -65,7 +65,7 @@ spawnButton controlAddress = (spawnLocal (do
 spawnLed :: Process ()
 spawnLed = (spawnLocal ( do
   pid <- getSelfPid
-  runClient (NodeConfig{myId=pid}) LedServerState{_ledStatus=False}))
+  runClient (NodeConfig{myId=pid}) LedServerState{_ledStatus=Led{status=False}}))
   >> return ()
 
 spawnLogger :: Process()
@@ -117,13 +117,13 @@ logMsgHandler (Envelop sender recipient (LedStatusChanged b))     = do
   l  <- use logMsg
   l' <- logBLS () ("Led Status changed to " ++ (show b))
   logMsg .= l ++ (snd l')
-  
+
 ledMsgHandler :: Envelop -> ServerAction()
 ledMsgHandler (Envelop sender recipient LedSwitch)                = do 
-  prevLedStatus <- use ledStatus
-  ledStatus .= (switch prevLedStatus)
+  prevLedStatus <- _1  %~ switch $ ledStatus
+  ledStatus .= prevLedStatus
 ledMsgHandler (Envelop sender recipient LedStatus)                = do
-  status <- use ledStatus
+  status <- _1  %~  id $ ledStatus
   sendTo sender (LedStatusChanged status)
 
 controlMsgHandler :: Envelop -> ServerAction()
