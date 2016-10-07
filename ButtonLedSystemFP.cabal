@@ -19,12 +19,15 @@ library
                      , DomainModel.MessageBSL
                      , Application.Local
                      , Application.Distributed
-  build-depends:       base >= 4.7 && < 5,
+  build-depends:       base,
                        mtl,
                        gtk,
                        distributed-process,
+                       network-transport-tcp,
+                       network-transport,
                        binary,
-                       network-transport-tcp
+                       bytestring,
+                       lens
   default-language:    Haskell2010
 
 executable ButtonLedSystemFP-exe

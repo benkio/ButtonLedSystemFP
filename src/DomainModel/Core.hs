@@ -1,9 +1,12 @@
+{-# LANGUAGE DeriveGeneric              #-} -- Allows Generic, for auto-generation of serialization code
 module DomainModel.Core where
 
 import Control.Concurrent.MVar
 import Control.Monad.Writer.Lazy
+import GHC.Generics (Generic) -- For auto-derivation of serialization
+import Data.Typeable (Typeable) -- For safe serialization
 
-data Led = Led{status :: Bool} deriving Show
+data Led = Led{status :: Bool} deriving (Show, Generic, Typeable)
 
 switch :: Led -> Led
 switch Led{status=l} = Led{status=not l}
