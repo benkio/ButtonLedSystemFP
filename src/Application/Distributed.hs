@@ -64,7 +64,8 @@ spawnSender buttonAddr = (spawnLocal (do
 spawnControl :: String -> String -> String -> Process ()
 spawnControl ledAddr loggerAddr buttonAddr = (spawnLocal (do
   pid <- getSelfPid
-  register "controlPID" pid
+  node <- getSelfNode
+  registerRemoteAsync node "controlPID" pid
   liftIO (putStrLn ("controlRegistered, input addr: " ++ ledAddr ++ " " ++ loggerAddr ++ " " ++ buttonAddr))
   ledId <- addressToProcessId ledAddr "ledPID"
   loggerId <- addressToProcessId loggerAddr "loggerPID"
@@ -77,7 +78,8 @@ spawnControl ledAddr loggerAddr buttonAddr = (spawnLocal (do
 spawnButton :: Process ()
 spawnButton = (spawnLocal (do
   pid <- getSelfPid
-  register "buttonPID" pid
+  node <- getSelfNode
+  registerRemoteAsync node "buttonPID" pid
   liftIO (putStrLn ("buttonRegistered " ++ show pid))
   runClient (NodeConfig{myId=pid}) ButtonServerState{_observers=[]}))
   >> return ()
@@ -85,7 +87,8 @@ spawnButton = (spawnLocal (do
 spawnLed :: Process ()
 spawnLed = (spawnLocal ( do
   pid <- getSelfPid
-  register "ledPID" pid
+  node <- getSelfNode
+  registerRemoteAsync node "ledPID" pid
   liftIO (putStrLn ("ledRegistered " ++ show pid))
   runClient (NodeConfig{myId=pid}) LedServerState{_ledStatus=Led{status=False}}))
   >> return ()
@@ -93,7 +96,8 @@ spawnLed = (spawnLocal ( do
 spawnLogger :: Process()
 spawnLogger = (spawnLocal ( do
   pid <- getSelfPid
-  register "loggerPID" pid
+  node <- getSelfNode
+  registerRemoteAsync node "loggerPID" pid
   liftIO (putStrLn ("loggerRegistered " ++ show pid))
   runClient (NodeConfig{myId=pid}) LogServerState{_logMsg=""}))
   >> return ()
@@ -127,8 +131,8 @@ discoverServer srvID serverName inputAddr = do
   reply <- expectTimeout 100 :: Process (Maybe WhereIsReply)
   liftIO $ putStrLn $ show reply
   case reply of
-    Just (WhereIsReply _ msid) -> case msid of
-                                    Just sid -> if (isInfixOf (show inputAddr) (show sid)) then return sid else discoverServer srvID serverName inputAddr
+    Just (WhereIsReply n msid) -> case msid of
+                                    Just sid -> if (n == serverName) then return sid else discoverServer srvID serverName inputAddr
                                     Nothing  -> discoverServer srvID serverName inputAddr
     Nothing                    -> discoverServer srvID serverName inputAddr
 
@@ -150,10 +154,10 @@ logMsgHandler (Envelop _ _ (LedStatusChanged b))     = do
 logMsgHandler _ = error "Unhandled Message"
 
 ledMsgHandler :: Envelop -> ServerAction()
-ledMsgHandler (Envelop _ _ LedSwitch)                = do 
+ledMsgHandler (Envelop _ _ LedSwitch)                     = do 
   prevLedStatus <- preuse ledStatus
   case prevLedStatus of
-    Just x  -> ledStatus .= x
+    Just x  -> ledStatus .= switch x
     Nothing -> error "Internal Server Error: get led node reference"
 ledMsgHandler (Envelop sender _ LedStatus)                = do
   s <- preuse ledStatus
@@ -186,8 +190,8 @@ buttonMsgHandler (Envelop sender _ RemoveObserver)        = do
 buttonMsgHandler (Envelop sender _ RegisterObserver)      = do
   obs <- use observers
   if (sender `elem` obs)
-    then observers .= (sender : obs)
-    else return ()
+    then return ()
+    else observers .= obs ++ [sender]
 buttonMsgHandler (Envelop _ _ ButtonPressed)         = do
   obs <- use observers
   _ <- forM obs (\o -> sendTo o NotifyPush)
