@@ -12,6 +12,7 @@ import Control.Distributed.Process
 import Control.Distributed.Process.Node
 import Control.Monad (forever, forM_)
 import Control.Lens
+import Control.Lens.Fold
 import System.Environment
 import Data.ByteString.Char8 (pack)
 import Control.Monad.RWS.Strict
@@ -120,21 +121,32 @@ logMsgHandler (Envelop sender recipient (LedStatusChanged b))     = do
 
 ledMsgHandler :: Envelop -> ServerAction()
 ledMsgHandler (Envelop sender recipient LedSwitch)                = do 
-  prevLedStatus <- use ledStatus
-  ledStatus .= prevLedStatus
+  prevLedStatus <- preuse ledStatus
+  case prevLedStatus of
+    Just x  -> ledStatus .= x
+    Nothing -> error "Internal Server Error: get led node reference"
 ledMsgHandler (Envelop sender recipient LedStatus)                = do
-  status <- use ledStatus
-  sendTo sender (LedStatusChanged status)
+  status <- preuse ledStatus
+  case status of
+    Just x -> sendTo sender (LedStatusChanged x)
+    Nothing -> error "Internal Server Error: get led node reference"
 
 controlMsgHandler :: Envelop -> ServerAction()
 controlMsgHandler (Envelop sender recipient NotifyPush)           = do
-  log <- use logger
-  l <- use led
-  sendTo log (ButtonPressed)
-  sendTo l (LedSwitch)
+  log <- preuse logger
+  l <- preuse led
+  case log of
+       Just x  -> sendTo x (ButtonPressed)
+       Nothing -> error "Internal Server Error: get log node reference"
+  case l of
+       Just x  -> sendTo x (LedSwitch) >> sendTo x (LedStatus)
+       Nothing -> error "Internal Server Error: get led node reference"
+
 controlMsgHandler (Envelop sender recipient (LedStatusChanged b)) = do
-  log <- use logger
-  sendTo log (LedStatusChanged b)
+  log <- preuse logger
+  case log of
+       Just x  -> sendTo x (LedStatusChanged b)
+       Nothing -> error "Internal Server Error: get log node reference"
 
 buttonMsgHandler :: Envelop -> ServerAction()
 buttonMsgHandler (Envelop sender recipient RemoveObserver)        = do
