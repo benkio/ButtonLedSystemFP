@@ -120,10 +120,10 @@ logMsgHandler (Envelop sender recipient (LedStatusChanged b))     = do
 
 ledMsgHandler :: Envelop -> ServerAction()
 ledMsgHandler (Envelop sender recipient LedSwitch)                = do 
-  prevLedStatus <- _1  %~ switch $ ledStatus
+  prevLedStatus <- use ledStatus
   ledStatus .= prevLedStatus
 ledMsgHandler (Envelop sender recipient LedStatus)                = do
-  status <- _1  %~  id $ ledStatus
+  status <- use ledStatus
   sendTo sender (LedStatusChanged status)
 
 controlMsgHandler :: Envelop -> ServerAction()
