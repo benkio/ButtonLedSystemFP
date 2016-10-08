@@ -36,7 +36,7 @@ instance Binary Envelop
 data NodeState = ButtonServerState { _observers :: [ProcessId] }
                  | LedServerState { _ledStatus :: Led }
                  | LogServerState { _logMsg :: String }
-                 | ControlServerState {_led :: ProcessId, _logger :: ProcessId}
+                 | ControlServerState {_led :: ProcessId, _logger :: ProcessId, _button :: ProcessId}
                  deriving (Show)
 makeLenses ''NodeState
 
