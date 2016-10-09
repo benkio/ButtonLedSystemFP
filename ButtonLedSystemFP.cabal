@@ -15,10 +15,15 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     DomainModel.Core
-                     , DomainModel.MessageBSL
+  exposed-modules:     Pure.Data
+                     , Pure.Behaviours
                      , Application.Local
-                     , Application.Distributed
+                     , Application.Distributed.IO.Main
+                     , Application.Distributed.IO.Infrastructure
+                     , Application.Distributed.Process.Infrastructure
+                     , Application.Distributed.Process.Specific
+                     , Application.Distributed.ServerAction.Infrastructure
+                     , Application.Distributed.ServerAction.MessageHandlers                      
   build-depends:       base,
                        mtl,
                        gtk,

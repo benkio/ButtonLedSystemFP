@@ -2,7 +2,8 @@ module Application.Local where
 
 import Graphics.UI.Gtk
 import Control.Concurrent.MVar
-import DomainModel.Core
+import Pure.Data
+import Pure.Behaviours
 import Control.Concurrent.MVar
 
 ledMVarObserver :: MVar Led -> IO String

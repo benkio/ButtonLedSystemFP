@@ -1,9 +1,8 @@
 module Main where
 
 
-import DomainModel.Core
 import Application.Local
-import Application.Distributed
+import Application.Distributed.IO.Main
 
 -- mainConsole
 -- mainGraphic
