@@ -5,6 +5,7 @@ import Control.Concurrent.MVar
 import Pure.Data
 import Pure.Behaviours
 import Control.Concurrent.MVar
+import Control.Monad.State.Lazy as S
 
 ledMVarObserver :: MVar Led -> IO String
 ledMVarObserver led = do  tryLedCurrentStatus <- tryTakeMVar led
@@ -40,15 +41,18 @@ mainGraphic = do
   mainGUI
 
 mainConsole :: IO ()
-mainConsole = mainConsole' initialLedStatus
+mainConsole = runStateT mainConsole' initialLedStatus >> return ()
 
-mainConsole' :: Led -> IO ()
-mainConsole' l = do
-  putStrLn "press enter to switch the led(ditig x + enter to exit)"
-  x <- getChar
+mainConsole' :: StateT Led IO Led
+mainConsole' = do
+  l <- S.get
+  liftIO $ putStrLn "press enter to switch the led(ditig x + enter to exit)"
+  x <- liftIO $ getChar
   if (x == 'x')
-    then return()
+    then return l
     else do
-      let l' = switch l
-      putStrLn $ show l'
-      mainConsole' l'
+      modify switch
+      l' <- S.get
+      liftIO $ putStrLn $ "current led State: " ++ show l'
+      mainConsole'
+

@@ -6,5 +6,6 @@ import Application.Distributed.IO.Main
 
 -- mainConsole
 -- mainGraphic
+-- mainDistributed
 main :: IO ()
 main = mainDistributed
