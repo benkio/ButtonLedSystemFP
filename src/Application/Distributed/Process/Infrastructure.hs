@@ -49,9 +49,9 @@ runClient config s postReceiveWork = do
     liftIO (putStrLn "startListening")
     (state', outputMessages) <- receiveWait [
             match $ run msgHandler]
-    liftIO (putStrLn "new message arrived")
+    liftIO (putStrLn ("new message arrived, send: " ++ show outputMessages))
     postReceiveWork state'
-    _ <-mapM (\x -> send (recipientOf x) x) outputMessages
+    _ <- mapM (\x -> send (recipientOf x) x) outputMessages
     runClient config state' postReceiveWork
 
 addressToProcessId :: String -> String -> Process ProcessId
