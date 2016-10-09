@@ -60,11 +60,9 @@ ledMsgHandler _ = error "Unhandled Message"
 
 logMsgHandler :: Envelop -> ServerAction()
 logMsgHandler (Envelop _ _ ButtonPressed)            = do
-  l  <- use logMsg
   l' <- logBLS () "ButtonPressed"
-  logMsg .= l ++ (snd l')
+  logMsg .= snd l'
 logMsgHandler (Envelop _ _ (LedStatusChanged b))     = do
-  l  <- use logMsg
   l' <- logBLS () ("Led Status changed to " ++ (show b))
-  logMsg .= l ++ (snd l')
+  logMsg .= snd l'
 logMsgHandler _ = error "Unhandled Message"
