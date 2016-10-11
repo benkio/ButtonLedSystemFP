@@ -2,9 +2,8 @@ module Application.Distributed.Process.Infrastructure where
 
 import Pure.Data
 import Pure.Behaviours
-import Application.Distributed.ServerAction.MessageHandlers
+import Pure.ServerAction.MessageHandlers
 import Control.Distributed.Process
-import Control.Distributed.Process.Node
 import Data.ByteString.Char8 (pack)
 import Control.Monad.RWS.Strict
 import Network.Transport     (EndPointAddress(EndPointAddress))

@@ -1,25 +1,20 @@
 {-# LANGUAGE DeriveGeneric              #-} -- Allows Generic, for auto-generation of serialization code
 module Pure.Behaviours where
 
-import Control.Concurrent.MVar
 import Control.Monad.Writer.Lazy
-import GHC.Generics (Generic) -- For auto-derivation of serialization
-import Data.Typeable (Typeable) -- For safe serialization
-import Data.Binary (Binary) -- Objects have to be binary to send over the network
 import Pure.Data
 import Control.Distributed.Process
-import Data.List
 
 -- Led Domain Model Behaviours
 
 switch :: Led -> Led
-switch Led{status=l} = Led{status=not l}
+switch Led{on=l} = Led{on=not l}
 
 getLedStatus :: Led -> Bool
-getLedStatus Led{status=s} = s
+getLedStatus Led{on=s} = s
 
 initialLedStatus :: Led
-initialLedStatus = Led{status=False}
+initialLedStatus = Led{on=False}
 
 {- Logger Domain Model Behaviours -}
 
@@ -34,17 +29,28 @@ setSubject (Subject _ xs) b = return $ Subject b xs
 getSubject :: Monad m => Subject m a -> m a
 getSubject (Subject a _) = return a
 
+ledNextState :: State Led Led
+ledNextState = do l <- S.get
+                  put (switch l)
+                  return l
+
 addObserver :: Monad m => Subject m a -> Observer m a -> m (Subject m a)
 addObserver (Subject a xs) o = return (Subject a (xs++[o]))
 
-notify :: Monad m => Subject m a -> m ()
-notify (Subject x []) = return ()
-notify (Subject x (f:fs)) = do f x
-                               notify $ Subject x fs
+notify :: Monad m => Subject m a -> m [a]
+notify (Subject _ []) = return []
+notify (Subject x (f:fs)) = case f of
+                              StatelessObs g -> do
+                                g x
+                                notify $ Subject x fs
+                              StatefullObs g -> do
+                                y <- g x
+                                ys <-(notify (Subject x fs))
+                                return $ y:ys
 
 nodeStateBuilder :: [ProcessId] -> NodeType -> NodeState
 nodeStateBuilder addr ButtonNT = ButtonServerState{_observers=addr}
-nodeStateBuilder _ LedNT = LedServerState{_ledStatus=Led{status=False}}
+nodeStateBuilder _ LedNT = LedServerState{_ledStatus=Led{on=False}}
 nodeStateBuilder _ (NT LogNT) = LogServerState{_logMsg=""}
 nodeStateBuilder (x:y:z) ControlNT = if ((null (tail z)) && (not (null z))) then ControlServerState{_led=x, _logger=y, _button=(head z)} else error "cannot bulidthe node state"
 nodeStateBuilder _ _ = error "cannot build the node state"

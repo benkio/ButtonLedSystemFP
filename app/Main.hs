@@ -8,4 +8,4 @@ import Application.Distributed.IO.Main
 -- mainGraphic
 -- mainDistributed
 main :: IO ()
-main = mainDistributed
+main = mainConsole'

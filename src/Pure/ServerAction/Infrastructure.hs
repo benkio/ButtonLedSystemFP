@@ -1,4 +1,4 @@
-module Application.Distributed.ServerAction.Infrastructure where
+module Pure.ServerAction.Infrastructure where
 
 import Pure.Data
 import Control.Distributed.Process

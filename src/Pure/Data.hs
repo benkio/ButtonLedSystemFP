@@ -13,6 +13,7 @@ import GHC.Generics (Generic) -- For auto-derivation of serialization
 import Data.Typeable (Typeable) -- For safe serialization
 import Control.Lens
 import Control.Monad.RWS.Strict
+import Control.Monad.State.Lazy
 
 data NodeType           = ButtonNT | LedNT | ControlNT | NT ReceiveOnlyNT | NT' SendOnlyNT deriving Show
 data ReceiveOnlyNT      = LogNT deriving Show
@@ -20,9 +21,9 @@ data SendOnlyNT         = PressButtonNT deriving Show
 
 -- Button and Led Data
 
-data Led = Led{status :: Bool} deriving (Show, Generic, Typeable)
+data Led = Led{on :: Bool} deriving (Show, Generic, Typeable)
 
-type Observer m a = a -> m()
+data Observer m a = StatelessObs (a -> m()) | StatefullObs (a -> m a)
 data Subject m a = Subject a ([Observer m a])
 
 --Messages and data in distribuited context
