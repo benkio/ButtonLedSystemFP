@@ -4,6 +4,7 @@ module Pure.Behaviours where
 import Control.Monad.Writer.Lazy
 import Pure.Data
 import Control.Distributed.Process
+import Control.Monad.State.Lazy
 
 -- Led Domain Model Behaviours
 
@@ -30,7 +31,7 @@ getSubject :: Monad m => Subject m a -> m a
 getSubject (Subject a _) = return a
 
 ledNextState :: State Led Led
-ledNextState = do l <- S.get
+ledNextState = do l <- get
                   put (switch l)
                   return l
 

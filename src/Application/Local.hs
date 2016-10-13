@@ -7,7 +7,7 @@ import Pure.Behaviours
 import Control.Concurrent.MVar
 import Control.Monad.State.Lazy as S
 import Control.Monad
-import Control.Monad.Trans.Maybe 
+import Control.Monad.Trans.Maybe
 
 
 ledMVarObserver :: MVar Led -> IO String
@@ -54,8 +54,8 @@ ledStateMachine = do
   if (x == 'x')
     then return l
     else do
-      modify switch
-      l' <- S.get
+      let l' =  execState ledNextState l
+      put $ l'
       liftIO $ putStrLn $ "current led State: " ++ show l'
       ledStateMachine
 
