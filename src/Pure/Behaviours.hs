@@ -17,6 +17,11 @@ getLedStatus Led{on=s} = s
 initialLedStatus :: Led
 initialLedStatus = Led{on=False}
 
+ledNextState :: State Led Led
+ledNextState = do l <- get
+                  put (switch l)
+                  return l
+
 {- Logger Domain Model Behaviours -}
 
 logBLS :: Monad m => a -> String -> m (a,String) -- WriterT String m a
@@ -29,11 +34,6 @@ setSubject (Subject _ xs) b = return $ Subject b xs
 
 getSubject :: Monad m => Subject m a -> m a
 getSubject (Subject a _) = return a
-
-ledNextState :: State Led Led
-ledNextState = do l <- get
-                  put (switch l)
-                  return l
 
 addObserver :: Monad m => Subject m a -> Observer m a -> m (Subject m a)
 addObserver (Subject a xs) o = return (Subject a (xs++[o]))
