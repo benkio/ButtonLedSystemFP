@@ -56,7 +56,8 @@ ledStateMachine = do
     else do
       let l' =  execState ledNextState l
       put $ l'
-      liftIO $ putStrLn $ "current led State: " ++ show l'
+      (l'', log) <- logBLS l' $ "current led State: " ++ show l'
+      liftIO $ putStrLn log
       ledStateMachine
 
 mainConsole' = do
