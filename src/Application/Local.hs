@@ -11,14 +11,17 @@ import Control.Monad.Trans.Maybe
 
 
 ledMVarObserver :: MVar Led -> IO String
-ledMVarObserver led = do  tryLedCurrentStatus <- tryTakeMVar led
-                          case tryLedCurrentStatus of
-                            Just l -> do putStrLn $ show l
-                                         updateLed <- tryPutMVar led (switch l)
-                                         if (updateLed)
-                                           then if (getLedStatus (switch l)) then return "On" else return "Off"
-                                           else error "error in led update"
-                            Nothing -> error "error in led Read"
+ledMVarObserver led = do
+  tryLedCurrentStatus <- tryTakeMVar led
+  case tryLedCurrentStatus of
+    Just l -> do putStrLn $ show l
+                 updateLed <- tryPutMVar led (switch l)
+                 if (updateLed)
+                   then if (getLedStatus (switch l))
+                          then return "On"
+                          else return "Off"
+                   else error "error in led update"
+    Nothing -> error "error in led Read"
 
 mainGraphic :: IO ()
 mainGraphic = do
@@ -31,15 +34,21 @@ mainGraphic = do
   led <- newMVar initialLedStatus
   set button [ buttonLabel := "Turn On led" ]
   subject  <- return (Subject () ([]) )
-  observer <- return $ StatelessObs (\_ -> do (label,l) <- ledMVarObserver led >>= (\x -> logBLS x "Led Observer executed!!")
-                                              labelSetText ledGUI label
-                                              putStrLn l)
+  observer <- return $
+    StatelessObs (\_ -> do
+                     (label,l) <- ledMVarObserver led >>=
+                                  (\x -> logBLS x "Led Observer executed!!")
+                     labelSetText ledGUI label
+                     putStrLn l)
 
   subject <- addObserver subject observer
   onClicked button (do notify subject; return ())
   boxPackStart hbox button PackGrow 0
   boxPackStart hbox ledGUI PackGrow 0
-  set window [ containerBorderWidth := 10, windowTitle := "ButtonLed subSystem", containerChild := hbox ]
+  set window
+    [ containerBorderWidth := 10,
+      windowTitle := "ButtonLed subSystem",
+      containerChild := hbox ]
   widgetShowAll window
   mainGUI
 
@@ -61,12 +70,14 @@ ledStateMachine = do
       ledStateMachine
 
 mainConsole' = do
-  subject <- return $ Subject (Led{D.on=False}) [StatefullObs (\l -> do
-                                                                l' <- return $ execState ledNextState l
-                                                                (l'', log) <- logBLS l' "Led Observer executed!!"
-                                                                putStrLn (show log)
-                                                                putStrLn (show l'')
-                                                                return l')]
+  subject <- return $ Subject
+    (Led{D.on=False})
+    [StatefullObs (\l -> do
+                      l' <- return $ execState ledNextState l
+                      (l'', log) <- logBLS l' "Led Observer executed!!"
+                      putStrLn (show log)
+                      putStrLn (show l'')
+                      return l')]
   ledStateMachine' subject
 
 ledStateMachine' :: Subject IO a -> IO()
