@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$USER_HOME$/projects/ButtonLedSystemFP/BLSJava/BLSJava.iml" filepath="$USER_HOME$/projects/ButtonLedSystemFP/BLSJava/BLSJava.iml" />
+      <module fileurl="file://$PROJECT_DIR$/BLSJava.iml" filepath="$PROJECT_DIR$/BLSJava.iml" />
     </modules>
   </component>
 </project>

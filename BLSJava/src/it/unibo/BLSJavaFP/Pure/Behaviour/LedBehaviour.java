@@ -27,6 +27,6 @@ public class LedBehaviour {
     }
 
     public static StateMonad<Led, Led> ledNextState(){
-        return StateMonad.<Led>get().flatMap((Led l) -> StateMonad.getState((Led x) -> switchStatus(x)));
+        return StateMonad.<Led>get().map((Led l) -> switchStatus(l));
     }
 }
