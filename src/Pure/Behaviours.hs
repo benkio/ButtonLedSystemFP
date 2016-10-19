@@ -50,11 +50,11 @@ notify (Subject x (f:fs)) = case f of
                                 return $ y:ys
 
 nodeStateBuilder :: [ProcessId] -> NodeType -> NodeState
-nodeStateBuilder addr ButtonNT = ButtonServerState{_observers=addr}
-nodeStateBuilder _ LedNT = LedServerState{_ledStatus=Led{on=False}}
-nodeStateBuilder _ (NT LogNT) = LogServerState{_logMsg=""}
-nodeStateBuilder (x:y:z) ControlNT = if ((null (tail z)) && (not (null z))) then ControlServerState{_led=x, _logger=y, _button=(head z)} else error "cannot bulidthe node state"
-nodeStateBuilder _ _ = error "cannot build the node state"
+nodeStateBuilder addr ButtonNT     = ButtonServerState{_observers=addr}
+nodeStateBuilder _ LedNT           = LedServerState{_ledStatus=Led{on=False}}
+nodeStateBuilder _ (NT LogNT)      = LogServerState{_logMsg=""}
+nodeStateBuilder (x:y:z) ControlNT = if ((null (tail z)) && (not (null z))) then ControlServerState{_led=x, _logger=y, _button=(head z)} else error "cannot bulid the node state"
+nodeStateBuilder _ _               = error "cannot build the node state"
 
 nodeConfigBuilder :: ProcessId -> NodeConfig
 nodeConfigBuilder i = NodeConfig{myId=i}

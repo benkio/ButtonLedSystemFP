@@ -15,7 +15,12 @@ import Control.Lens
 import Control.Monad.RWS.Strict
 import Control.Monad.State.Lazy
 
-data NodeType           = ButtonNT | LedNT | ControlNT | NT ReceiveOnlyNT | NT' SendOnlyNT deriving Show
+data NodeType           = ButtonNT
+                        | LedNT
+                        | ControlNT
+                        | NT ReceiveOnlyNT
+                        | NT' SendOnlyNT deriving Show
+
 data ReceiveOnlyNT      = LogNT deriving Show
 data SendOnlyNT         = PressButtonNT deriving Show
 
@@ -37,7 +42,9 @@ data MessageContent = NotifyPush
                     | RegisterObserver
                     deriving (Typeable, Generic, Show)
 
-data Envelop = Envelop {senderOf :: ProcessId, recipientOf :: ProcessId, msg :: MessageContent}
+data Envelop = Envelop {senderOf :: ProcessId,
+                        recipientOf :: ProcessId,
+                        msg :: MessageContent}
                deriving (Show, Generic, Typeable)
 
 -- Server Data
@@ -45,14 +52,22 @@ data Envelop = Envelop {senderOf :: ProcessId, recipientOf :: ProcessId, msg :: 
 data NodeState = ButtonServerState { _observers :: [ProcessId] }
                  | LedServerState { _ledStatus :: Led }
                  | LogServerState { _logMsg :: String }
-                 | ControlServerState {_led :: ProcessId, _logger :: ProcessId, _button :: ProcessId}
+                 | ControlServerState {_led :: ProcessId,
+                                       _logger :: ProcessId,
+                                       _button :: ProcessId}
                  deriving (Show)
 makeLenses ''NodeState
 
 data NodeConfig = NodeConfig{myId :: ProcessId}
 
-newtype ServerAction a = ServerAction {runAction :: RWS NodeConfig [Envelop] NodeState a}
-    deriving (Functor, Applicative, Monad, MonadState NodeState, MonadWriter [Envelop], MonadReader NodeConfig)
+newtype ServerAction a =
+  ServerAction {runAction :: RWS NodeConfig [Envelop] NodeState a}
+    deriving (Functor,
+              Applicative,
+              Monad,
+              MonadState NodeState,
+              MonadWriter [Envelop],
+              MonadReader NodeConfig)
 
 -- Binary Instances for network sending
 
