@@ -1,23 +1,16 @@
 package it.unibo.BLSJavaFP;
 
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
-import it.unibo.BLSJavaFP.Pure.Data.Led;
-import it.unibo.BLSJavaFP.Pure.FunctionalAbstraction.*;
-
-import javax.swing.plaf.nimbus.State;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Scanner;
-import fj.data.List;
-
+import it.unibo.BLSJavaFP.EffectFull.Console;
 import static it.unibo.BLSJavaFP.Pure.Behaviour.LedBehaviour.initialLedStatus;
-import static it.unibo.BLSJavaFP.Pure.Behaviour.LedBehaviour.ledNextState;
-import static it.unibo.BLSJavaFP.Pure.Behaviour.LoggerBehaviour.logLed;
+
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args){
+        Console.ledStateMachine().run(initialLedStatus());
+    }
+    
+   /* public static void main(String[] args) {
 	    IOMonad<Unit> main = new IOMonad<Unit>(x -> {
             ledStateMachine().runState.apply(initialLedStatus());
             return Unit.VALUE;
@@ -53,4 +46,5 @@ public class Main {
             }
         });
     }
+    */
 }

@@ -42,3 +42,7 @@ tags
 /src/style.css
 /_site/
 /.dir-locals.el
+/BLSJava/nbproject/private/
+/BLSJava/BLSJava/.nb-gradle/
+/BLSJava/.nb-gradle/
+/BLSJava/build/

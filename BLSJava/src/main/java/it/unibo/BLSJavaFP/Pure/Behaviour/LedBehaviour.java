@@ -1,9 +1,7 @@
 package it.unibo.BLSJavaFP.Pure.Behaviour;
 
+import fj.data.State;
 import it.unibo.BLSJavaFP.Pure.Data.Led;
-import it.unibo.BLSJavaFP.Pure.FunctionalAbstraction.StateMonad;
-
-import static it.unibo.BLSJavaFP.Pure.FunctionalAbstraction.StateMonad.get;
 
 /**
  * Created by benkio on 10/19/16.
@@ -26,7 +24,7 @@ public class LedBehaviour {
         return new Led(!getLedStatus(l));
     }
 
-    public static StateMonad<Led, Led> ledNextState(){
-        return StateMonad.<Led>get().map((Led l) -> switchStatus(l));
+    public static State<Led, Led> ledNextState(){
+        return State.<Led>init().map((Led l) -> (Led) switchStatus(l));
     }
 }
