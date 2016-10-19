@@ -9,6 +9,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Scanner;
+import fj.data.List;
 
 import static it.unibo.BLSJavaFP.Pure.Behaviour.LedBehaviour.initialLedStatus;
 import static it.unibo.BLSJavaFP.Pure.Behaviour.LedBehaviour.ledNextState;
