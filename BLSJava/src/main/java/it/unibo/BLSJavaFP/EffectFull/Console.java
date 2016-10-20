@@ -6,18 +6,20 @@ import fj.P2;
 import fj.Unit;
 import fj.data.IO;
 import fj.data.IOFunctions;
+import fj.data.List;
 import fj.data.State;
 import static it.unibo.BLSJavaFP.EffectFull.Console.ledStateMachine;
 import static it.unibo.BLSJavaFP.Pure.Behaviour.LedBehaviour.ledNextState;
 import static it.unibo.BLSJavaFP.Pure.Behaviour.LoggerBehaviour.logLed;
 import it.unibo.BLSJavaFP.Pure.Data.Led;
+import it.unibo.BLSJavaFP.Pure.Data.Subject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
    
 public class Console {
     
-    final static IO<Boolean> askPress = () -> {
+    public final static IO<Boolean> askPress = () -> {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         System.out.println("premi x per terminare o un tasto qualsiasi per cambiare lo stato del led");
         String response = null;
@@ -28,7 +30,7 @@ public class Console {
         return response.equals("x");
     };
 
-    final static F<String,IO<Unit>> showLog = (String l) -> {
+    public final static F<String,IO<Unit>> showLog = (String l) -> {
         System.out.println(l);
         return IOFunctions.ioUnit;
     };
@@ -51,5 +53,15 @@ public class Console {
             }
         };
         return State.unit(fun);
+    }
+    
+    public static <T> IO<Unit> ledStateMachine1(Subject<T> s) throws IOException {
+        boolean b = askPress.run();
+        if(b) return IOFunctions.ioUnit;
+        else{
+            List<T> l = Subject.notify(s).run();
+            Subject<T> s1 = Subject.setSubject(s, l.head());
+            return ledStateMachine1(s1);
+        }
     }
 }
