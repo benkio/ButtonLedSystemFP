@@ -21,7 +21,15 @@ import java.util.logging.Logger;
 public class Main {
 
     public static void main(String[] args){
-        //Console.ledStateMachine().run(initialLedStatus());
+        GUIMain();
+    }
+    
+    private static void SimplerMain(){
+        Console.ledStateMachine().run(initialLedStatus());
+    }
+    
+    private static void ConsoleMain(){
+        
         F<Led,IO<Led>> f = l -> {
             Led l1 = l;
             try {
@@ -42,6 +50,14 @@ public class Main {
         Subject<Led> s = new Subject(initialLedStatus(), List.list(o));
         try {
             Console.ledStateMachine1(s).run();
+        } catch (IOException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private static void GUIMain(){
+        try {
+            Console.graphicMain.run();
         } catch (IOException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
