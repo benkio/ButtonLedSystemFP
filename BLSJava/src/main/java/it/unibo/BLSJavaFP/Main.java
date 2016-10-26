@@ -6,6 +6,8 @@ import fj.Unit;
 import fj.data.IO;
 import fj.data.IOFunctions;
 import fj.data.List;
+import it.unibo.BLSJavaFP.EffectFull.BLSSwing;
+import it.unibo.BLSJavaFP.EffectFull.Button;
 import it.unibo.BLSJavaFP.EffectFull.Console;
 import static it.unibo.BLSJavaFP.Pure.Behaviour.LedBehaviour.initialLedStatus;
 import static it.unibo.BLSJavaFP.Pure.Behaviour.LedBehaviour.ledNextState;
@@ -13,6 +15,7 @@ import static it.unibo.BLSJavaFP.Pure.Behaviour.LoggerBehaviour.logLed;
 import it.unibo.BLSJavaFP.Pure.Data.Led;
 import it.unibo.BLSJavaFP.Pure.Data.Observer;
 import it.unibo.BLSJavaFP.Pure.Data.Subject;
+import it.unibo.BLSJavaFP.Pure.MVar;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,7 +28,7 @@ public class Main {
     }
     
     private static void SimplerMain(){
-        Console.ledStateMachine().run(initialLedStatus());
+        it.unibo.BLSJavaFP.EffectFull.Led.ledStateMachine().run(initialLedStatus());
     }
     
     private static void ConsoleMain(){
@@ -49,7 +52,7 @@ public class Main {
         Observer<Led> o = Observer.stateFullObs(f);
         Subject<Led> s = new Subject(initialLedStatus(), List.list(o));
         try {
-            Console.ledStateMachine1(s).run();
+            it.unibo.BLSJavaFP.EffectFull.Led.ledStateMachine1(s).run();
         } catch (IOException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -57,9 +60,23 @@ public class Main {
     
     private static void GUIMain(){
         try {
-            Console.graphicMain.run();
+            graphicMain.run();
         } catch (IOException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+     private static final IO<Unit> graphicMain = () -> {
+        MVar status = MVar.withDefault(initialLedStatus());
+        BLSSwing.btn.addActionListener((java.awt.event.ActionEvent e) -> {
+            String ledMessage = "";
+            try {
+                ledMessage = (String) Button.mVarObserver(status).run();
+            } catch (IOException f) {
+            }
+            BLSSwing.ledLabel.setText(ledMessage);
+        });
+        BLSSwing.main();
+        return Unit.unit();
+    };
 }

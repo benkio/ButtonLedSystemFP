@@ -5,10 +5,7 @@
  */
 package it.unibo.BLSJavaFP.Pure.Data;
 
-import fj.data.IO;
-import fj.data.IOFunctions;
 import fj.data.List;
-import java.io.IOException;
 
 /**
  *
@@ -23,30 +20,6 @@ public class Subject<T> {
         this.obs = obs;
     }
     
-    public static <T> Subject<T> setSubject(Subject<T> s, T a){
-        return new Subject<T>(a, s.obs);
-    }
-    
-    public static <T> T getSubject(Subject<T> s){
-        return s.sub;
-    }
-    
-    public static <T> Subject<T> addObserver(Subject<T> s, Observer<T> o){
-        return new Subject(s.sub, s.obs.cons(o));
-    }
-    
-    public static <T> IO<List<T>> notify(Subject<T> s) throws IOException{
-        if (s.obs.isEmpty()) return IOFunctions.unit(List.nil());
-        else{
-            Observer<T> o = s.obs.head();
-            if (o.func.isLeft()){
-                o.func.left().value().f(s.sub);
-                return notify(new Subject(s.sub, s.obs.tail()));
-            }else{
-                T x = o.func.right().value().f(s.sub).run();
-                List<T> xs = (List<T>) notify(new Subject(s.sub, s.obs.tail())).run();
-                return IOFunctions.unit(List.cons(x, xs));
-            }
-        }
-    }       
+    public T getSub(){ return sub; }
+    public List<Observer<T>> getObs(){ return obs; }
 }
