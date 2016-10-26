@@ -8,6 +8,7 @@ package it.unibo.BLSJavaFP.EffectFull;
 import fj.data.IO;
 import fj.data.IOFunctions;
 import fj.data.List;
+import it.unibo.BLSJavaFP.Pure.Behaviour.LedBehaviour;
 import static it.unibo.BLSJavaFP.Pure.Behaviour.LedBehaviour.ledNextState;
 import it.unibo.BLSJavaFP.Pure.Data.Led;
 import it.unibo.BLSJavaFP.Pure.Data.Observer;
@@ -27,7 +28,7 @@ public class Button {
             Led lnext = ledNextState().eval(l);
             ml.put(lnext);
             String ledMessage;
-            if (lnext.on) {
+            if (LedBehaviour.getLedStatus(lnext)) {
                 ledMessage = "on";
             } else {
                 ledMessage = "off";
