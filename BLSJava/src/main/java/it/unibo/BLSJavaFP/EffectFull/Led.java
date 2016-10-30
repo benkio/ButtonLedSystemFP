@@ -54,5 +54,4 @@ public class Led {
             return ledStateMachine1(s1);
         }
     }
-    
 }
